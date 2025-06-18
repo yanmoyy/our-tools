@@ -1,18 +1,21 @@
 # OUR TOOLS
 
-- The project is a collection of tools that can solve our daily problems.
-- The purpose of this project is helping us to improve problem solving skills.
+A collection of tools to solve daily problems and improve problem-solving skills
+through automation.
+
+## Purpose
+
+The purpose of this project is to help us enhance our problem-solving skills by
+building practical tools.
 
 ## Tools List
 
-There are some topics that encourage us to build tools. Before implementing,
-just add a topic or problem to the list.
+Add a topic or problem to the list before implementing. At the end of the day,
+our problems will be part of automation.
 
-At the end of the day, our problems will be the part of Automation.
+### Problems (Not Yet Solved)
 
-### Problems (Not yet solved)
-
-1. I want to send a sns message (kakao talk, instagram, etc) with terminal,
-   which not change the context while I am working on my computer.
-
-1. I want to order a sandwich which I daily eat. How can I automate this task?
+1. **SNS Message Sender**: Send an SNS message (KakaoTalk, Instagram, etc.) via
+   terminal without changing context while working on the computer. (yanmoyy)
+   - working on: KakaoTalk
+2. **Sandwich Order Automation**: Automate ordering a daily sandwich.

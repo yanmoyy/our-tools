@@ -9,7 +9,9 @@ type mode struct {
 
 func commandMode(cfg *config, args ...string) error {
 	if len(args) == 0 {
-		return fmt.Errorf("need to specify mode")
+		fmt.Println("Current mode:", cfg.snsType)
+		printModeHelp()
+		return nil
 	}
 	if len(args) > 1 {
 		return fmt.Errorf("too many arguments")
@@ -26,7 +28,7 @@ func commandMode(cfg *config, args ...string) error {
 }
 
 func printModeHelp() {
-	fmt.Println("Usage: sns mode <mode>")
+	fmt.Println("Usage: mode [mode]")
 	fmt.Println("Available modes:")
 	for _, mode := range getAvaliableModes() {
 		fmt.Printf("  - %s (%s)\n", mode.snsType, mode.description)
@@ -34,7 +36,11 @@ func printModeHelp() {
 }
 
 func setMode(cfg *config, mode snsType) {
-	cfg.snsType = mode
+	err := cfg.setMode(mode)
+	if err != nil {
+		fmt.Printf("Failed to set mode: %s\n", err)
+		return
+	}
 	fmt.Printf("Set mode to %s\n", mode)
 }
 

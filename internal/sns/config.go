@@ -2,7 +2,6 @@ package sns
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/yanmoyy/our-tools/internal/sns/kakao"
 )
@@ -20,13 +19,24 @@ type config struct {
 }
 
 func NewConfig() (*config, error) {
-	kakaoApiKey := os.Getenv("KAKAO_API_KEY")
-	if kakaoApiKey == "" {
-		return nil, fmt.Errorf("KAKAO_API_KEY is not set")
-	}
-	kakaoCfg := kakao.NewConfig(kakaoApiKey, "http://localhost:8080/callback")
 	return &config{
-		kakaoConfig: kakaoCfg,
-		snsType:     Unknown,
+		snsType: Unknown,
 	}, nil
+}
+
+func (cfg *config) setMode(snsType snsType) error {
+	switch snsType {
+	case Kakao:
+		cfg.snsType = snsType
+		if cfg.kakaoConfig == nil {
+			config, err := kakao.NewConfig()
+			if err != nil {
+				return err
+			}
+			cfg.kakaoConfig = config
+		}
+	default:
+		return fmt.Errorf("unknown sns type: %s", snsType)
+	}
+	return nil
 }

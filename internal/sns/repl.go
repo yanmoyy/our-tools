@@ -72,7 +72,7 @@ func getCommands() map[string]cliCommand {
 		},
 		"mode": {
 			name:        "mode",
-			description: "Change target SNS Mode",
+			description: "Change (or show) target SNS Mode (args: [mode])",
 			callback:    commandMode,
 			helper:      printModeHelp,
 		},

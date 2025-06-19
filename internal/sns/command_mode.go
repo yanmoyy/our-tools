@@ -17,14 +17,16 @@ func commandMode(cfg *config, args ...string) error {
 		return fmt.Errorf("too many arguments")
 	}
 	mode := args[0]
-
 	switch snsType(mode) {
 	case Kakao:
-		setMode(cfg, Kakao)
+		err := setMode(cfg, Kakao)
+		if err != nil {
+			return err
+		}
+		return cfg.kakaoConfig.StartMode()
 	default:
-		return fmt.Errorf("unknown mode: %s", mode)
+		return fmt.Errorf("unknown mode argument: %s", mode)
 	}
-	return nil
 }
 
 func printModeHelp() {
@@ -35,13 +37,14 @@ func printModeHelp() {
 	}
 }
 
-func setMode(cfg *config, mode snsType) {
+// call setMode from config, and print line
+func setMode(cfg *config, mode snsType) error {
 	err := cfg.setMode(mode)
 	if err != nil {
-		fmt.Printf("Failed to set mode: %s\n", err)
-		return
+		return fmt.Errorf("failed to set mode: %s", err)
 	}
 	fmt.Printf("Set mode to %s\n", mode)
+	return nil
 }
 
 func getAvaliableModes() []mode {

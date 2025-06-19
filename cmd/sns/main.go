@@ -17,13 +17,3 @@ func main() {
 	}
 	sns.StartRepl(cfg)
 }
-
-//
-// func runCallbackServer() {
-// 	fmt.Println("Listening on port 8080")
-// 	callbackServer := &http.Server{
-// 		Addr:              ":8080",
-// 		ReadHeaderTimeout: 3 * time.Second,
-// 	}
-// 	log.Fatal(callbackServer.ListenAndServe())
-// }

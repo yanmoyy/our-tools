@@ -38,7 +38,7 @@ func StartRepl(cfg *config) {
 		err := command.callback(cfg, args...)
 		if err != nil {
 			fmt.Printf("Error: %s\n", err)
-			if command.helper != nil {
+			if strings.Contains(err.Error(), "argument") {
 				command.helper()
 			}
 		}

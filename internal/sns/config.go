@@ -24,6 +24,7 @@ func NewConfig() (*config, error) {
 	}, nil
 }
 
+// setMode sets mode and initializes config for the mode
 func (cfg *config) setMode(snsType snsType) error {
 	switch snsType {
 	case Kakao:

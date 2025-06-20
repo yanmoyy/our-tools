@@ -19,3 +19,6 @@ our problems will be part of automation.
    terminal without changing context while working on the computer. (yanmoyy)
    - working on: KakaoTalk
 2. **Sandwich Order Automation**: Automate ordering a daily sandwich.
+
+3. [PPT Crawling](./cmd/ppt-crawling/README.md): Crawl a PPT file and save it as HTML file.
+   - with Google Custom Search JSON API

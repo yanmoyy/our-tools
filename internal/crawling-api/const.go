@@ -1,4 +1,4 @@
-package main
+package crawling_api
 
 const (
 	GooGleSearch  = "https://www.google.com/search?q="

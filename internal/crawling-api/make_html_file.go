@@ -1,4 +1,4 @@
-package main
+package crawling_api
 
 import (
 	"os"

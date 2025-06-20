@@ -1,8 +1,8 @@
-package main
+package crawling_api
 
 import "fmt"
 
-func commandHelp(cfg *config, args ...string) error {
+func commandHelp(cfg *Config, args ...string) error {
 	fmt.Println()
 	fmt.Println("Welcome to the parise crawler!")
 	fmt.Println("Usage: ")

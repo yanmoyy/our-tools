@@ -68,6 +68,8 @@ CSE_API_KEY=your_cse_api_key
     ppt-crawler >
     ```
 
+- **note** : if you type title with korea language, it will happen error if you doesn't delete the space.
+
 ### 4. num
 
 - search ppt download url by number.

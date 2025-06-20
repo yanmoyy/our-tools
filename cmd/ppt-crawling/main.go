@@ -8,10 +8,11 @@ import (
 
 func main() {
 	pptClient := crawling_api.NewClient(5 * time.Second)
-	cfg := &config{
-		client:      pptClient,
-		downloadURL: map[string]string{},
+	cfg := &crawling_api.Config{
+		Client:      pptClient,
+		DownloadURL: map[string]string{},
 	}
-	startRepl(cfg)
+
+	crawling_api.StartRepl(cfg)
 
 }

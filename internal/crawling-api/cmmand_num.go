@@ -1,4 +1,4 @@
-package main
+package crawling_api
 
 import (
 	"bufio"
@@ -7,12 +7,12 @@ import (
 	"strings"
 )
 
-func commandTitle(cfg *config, args ...string) error {
+func commandNum(cfg *Config, args ...string) error {
 	if len(args) > 0 {
-		return fmt.Errorf("usage: title")
+		return fmt.Errorf("usage: num")
 	}
 
-	urls, err := titleRepl(cfg)
+	urls, err := numRepl(cfg)
 	if err != nil {
 		return err
 	}
@@ -24,14 +24,16 @@ func commandTitle(cfg *config, args ...string) error {
 	return nil
 }
 
-func titleRepl(cfg *config) ([]string, error) {
+func numRepl(cfg *Config) ([]string, error) {
 	scanner := bufio.NewScanner(os.Stdin)
 	urls := []string{}
 	for {
+
+		fmt.Print("num > ")
 		var lines []string
-		fmt.Print("title > ")
 		for scanner.Scan() {
 			line := scanner.Text()
+
 			if line == "" || line == "exit" {
 				break
 			}
@@ -46,7 +48,7 @@ func titleRepl(cfg *config) ([]string, error) {
 			break
 		}
 
-		postfix := " ppt"
+		postfix := "장 ppt"
 		for _, line := range lines {
 			words := cleanInput(line)
 			if len(words) == 0 {
@@ -55,10 +57,11 @@ func titleRepl(cfg *config) ([]string, error) {
 			if len(words) == 1 && words[0] == "exit" {
 				return urls, nil
 			}
+
 			queryString := strings.Join(words, " ")
 			fullQuery := fmt.Sprintf("%s%s", queryString, postfix)
 
-			url, err := titleSearch(cfg, fullQuery)
+			url, err := numSearch(cfg, fullQuery)
 			if err != nil {
 				if err.Error() == "no search result found" {
 					fmt.Println(err)
@@ -66,8 +69,9 @@ func titleRepl(cfg *config) ([]string, error) {
 				}
 				return nil, err
 			}
-			cfg.downloadURL[queryString] = url
+
 			urls = append(urls, url)
+			cfg.DownloadURL[queryString] = url
 			fmt.Printf("Processing %s\n", queryString)
 		}
 
@@ -76,15 +80,16 @@ func titleRepl(cfg *config) ([]string, error) {
 	return urls, nil
 }
 
-func titleSearch(cfg *config, query string) (string, error) {
-	response, err := cfg.client.GoogleSearch(query)
+func numSearch(cfg *Config, query string) (string, error) {
+
+	response, err := cfg.Client.GoogleSearch(query)
 	if err != nil {
 		return "", err
 	}
 
 	var link string
 	for _, item := range response.Items {
-		if strings.HasPrefix(item.Link, TistoryTitle) {
+		if strings.HasPrefix(item.Link, TistoryNum) {
 			link = item.Link
 		}
 	}
@@ -97,16 +102,20 @@ func titleSearch(cfg *config, query string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	err = makeHTMLFile(str)
+	if err != nil {
+		return "", err
+	}
 
-	imageblocks, err := getImageBlocks(str)
+	fileblock, err := getFileBlocks(str)
 	if err != nil {
 		return "", err
 	}
 
 	var urls []string
 
-	for _, imageblock := range imageblocks {
-		hrefs, _ := getURLFromBlock(imageblock)
+	for _, fileblock := range fileblock {
+		hrefs, _ := getURLFromBlock(fileblock)
 		urls = append(urls, hrefs...)
 	}
 
@@ -114,7 +123,5 @@ func titleSearch(cfg *config, query string) (string, error) {
 		return "", fmt.Errorf("no url found")
 	}
 
-	url := fmt.Sprintf("%s%s", urls[1], "?original")
-
-	return url, nil
+	return urls[0], nil
 }

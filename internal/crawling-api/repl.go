@@ -1,23 +1,21 @@
-package main
+package crawling_api
 
 import (
 	"bufio"
 	"fmt"
 	"os"
 	"strings"
-
-	crawling_api "github.com/yanmoyy/our-tools/internal/crawling-api"
 )
 
-type config struct {
-	client      crawling_api.Client
-	downloadURL map[string]string
+type Config struct {
+	Client      Client
+	DownloadURL map[string]string
 }
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config, ...string) error
+	callback    func(*Config, ...string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -55,7 +53,7 @@ func getCommands() map[string]cliCommand {
 	}
 }
 
-func startRepl(cfg *config) {
+func StartRepl(cfg *Config) {
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for {

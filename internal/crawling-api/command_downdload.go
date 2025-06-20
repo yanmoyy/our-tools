@@ -1,4 +1,4 @@
-package main
+package crawling_api
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func commandDownload(cfg *config, args ...string) error {
+func commandDownload(cfg *Config, args ...string) error {
 	var filepath string
 	if len(args) < 1 {
 		filepath = "/mnt/c/Users/alstj/Downloads/"
@@ -19,7 +19,7 @@ func commandDownload(cfg *config, args ...string) error {
 	fmt.Println("download")
 	fmt.Println()
 
-	for query, url := range cfg.downloadURL {
+	for query, url := range cfg.DownloadURL {
 
 		filepath := fmt.Sprintf("%s%s.ppt", filepath, query)
 		err := DownloadFile(url, filepath)

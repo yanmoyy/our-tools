@@ -3,13 +3,12 @@ package kakao
 import (
 	"fmt"
 	"os"
+
+	"github.com/yanmoyy/our-tools/internal/sns/kakao/auth"
 )
 
 type Config struct {
-	apiKey      string
-	redirectURI string
-	authCode    string
-	token       token
+	auth *auth.Config
 }
 
 func NewConfig() (*Config, error) {
@@ -19,13 +18,12 @@ func NewConfig() (*Config, error) {
 	}
 	redirectURI := "http://localhost:8080/oauth"
 	return &Config{
-		apiKey:      apiKey,
-		redirectURI: redirectURI,
+		auth: auth.NewConfig(apiKey, redirectURI),
 	}, nil
 }
 
 func (cfg *Config) StartMode() error {
-	err := cfg.login()
+	err := cfg.auth.Login()
 	if err != nil {
 		return err
 	}

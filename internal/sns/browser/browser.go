@@ -1,4 +1,4 @@
-package kakao
+package browser
 
 import (
 	"fmt"
@@ -6,8 +6,7 @@ import (
 	"runtime"
 )
 
-// openBrowser attempts to open the URL in the default browser
-func openBrowser(url string) error {
+func Open(url string) error {
 	var cmd *exec.Cmd
 
 	switch runtime.GOOS {

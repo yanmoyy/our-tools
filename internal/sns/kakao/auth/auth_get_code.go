@@ -1,4 +1,4 @@
-package kakao
+package auth
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/yanmoyy/our-tools/internal/sns/browser"
 	"github.com/yanmoyy/our-tools/internal/sns/color"
 )
 
@@ -107,7 +108,7 @@ func requestAuthCode(clientID, redirectURI string) error {
 	fmt.Println(color.Yellow.ColorString(req.URL.String()))
 
 	// Optionally, attempt to open the URL in the default browser
-	if err := openBrowser(req.URL.String()); err != nil {
+	if err := browser.Open(req.URL.String()); err != nil {
 		fmt.Printf("Failed to open browser automatically: %v\n", err)
 		fmt.Println("Please manually open the URL above.")
 	}

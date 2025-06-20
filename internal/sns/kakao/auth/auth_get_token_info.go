@@ -1,4 +1,4 @@
-package kakao
+package auth
 
 import (
 	"encoding/json"

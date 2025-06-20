@@ -10,11 +10,9 @@ import (
 func getHTML(rawURL string) (string, error) {
 
 	resp, err := http.Get(rawURL)
-	fmt.Println("start getHTML")
 	if resp.StatusCode > 399 && resp.StatusCode < 499 {
 		return "", err
 	}
-	fmt.Println("end getHTML")
 	defer resp.Body.Close()
 
 	contentType := resp.Header.Get("Content-Type")

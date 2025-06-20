@@ -12,64 +12,72 @@ func commandNum(cfg *config, args ...string) error {
 		return fmt.Errorf("usage: num")
 	}
 
-	urls, queries, err := numRepl(cfg)
+	urls, err := numRepl(cfg)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println()
-	fmt.Println("===================================")
-	fmt.Println("                URL                ")
-	fmt.Println("===================================")
-	fmt.Println()
-
 	if len(urls) == 0 {
-		return fmt.Errorf("no url found\n")
-	}
-
-	for i, url := range urls {
-		fmt.Printf("%s: %s\n\n", queries[i], url)
+		return fmt.Errorf("no url found")
 	}
 
 	return nil
 }
 
-func numRepl(cfg *config) ([]string, []string, error) {
+func numRepl(cfg *config) ([]string, error) {
 	scanner := bufio.NewScanner(os.Stdin)
 	urls := []string{}
-	queries := []string{}
 	for {
 
 		fmt.Print("num > ")
-		scanner.Scan()
+		var lines []string
+		for scanner.Scan() {
+			line := scanner.Text()
 
-		words := cleanInput(scanner.Text())
-		if len(words) == 0 {
-			continue
+			if line == "" || line == "exit" {
+				break
+			}
+			lines = append(lines, line)
 		}
-		if len(words) == 1 && words[0] == "exit" {
+
+		if err := scanner.Err(); err != nil {
+			return nil, fmt.Errorf("error reading input: %v", err)
+		}
+
+		if len(lines) == 0 {
 			break
 		}
+
 		postfix := "장 ppt"
-
-		queries = append(queries, words[0])
-
-		fullQuery := fmt.Sprintf("%s%s", words[0], postfix)
-		fmt.Println("fullQuery: ", fullQuery)
-
-		url, err := numSearch(cfg, fullQuery)
-		if err != nil {
-			if err.Error() == "no search result found" {
-				fmt.Println(err)
+		for _, line := range lines {
+			words := cleanInput(line)
+			if len(words) == 0 {
 				continue
 			}
+			if len(words) == 1 && words[0] == "exit" {
+				return urls, nil
+			}
 
-			return nil, nil, err
+			queryString := strings.Join(words, " ")
+			fullQuery := fmt.Sprintf("%s%s", queryString, postfix)
+
+			url, err := numSearch(cfg, fullQuery)
+			if err != nil {
+				if err.Error() == "no search result found" {
+					fmt.Println(err)
+					continue
+				}
+				return nil, err
+			}
+
+			urls = append(urls, url)
+			cfg.downloadURL[queryString] = url
+			fmt.Printf("Processing %s\n", queryString)
 		}
-		urls = append(urls, url)
+
 	}
 
-	return urls, queries, nil
+	return urls, nil
 }
 
 func numSearch(cfg *config, query string) (string, error) {
@@ -79,17 +87,12 @@ func numSearch(cfg *config, query string) (string, error) {
 		return "", err
 	}
 
-	println("start")
-
 	var link string
 	for _, item := range response.Items {
 		if strings.HasPrefix(item.Link, TistoryNum) {
 			link = item.Link
 		}
 	}
-
-	fmt.Println("Link :", link)
-	println("end")
 
 	if link == "" {
 		return "", fmt.Errorf("no search result found")

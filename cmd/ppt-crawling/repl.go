@@ -3,20 +3,15 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"net/url"
 	"os"
 	"strings"
-	"sync"
 
 	crawling_api "github.com/yanmoyy/our-tools/internal/crawling-api"
 )
 
 type config struct {
-	client             crawling_api.Client
-	baseURL            *url.URL
-	mu                 *sync.Mutex
-	concurrencyControl chan struct{}
-	wg                 *sync.WaitGroup
+	client      crawling_api.Client
+	downloadURL map[string]string
 }
 
 type cliCommand struct {
@@ -36,6 +31,11 @@ func getCommands() map[string]cliCommand {
 			name:        "num",
 			description: fmt.Sprintf("search praise download url in %s", TistoryNum),
 			callback:    commandNum,
+		},
+		"download": {
+			name:        "download",
+			description: "download all praise",
+			callback:    commandDownload,
 		},
 		"exit": {
 			name:        "exit",

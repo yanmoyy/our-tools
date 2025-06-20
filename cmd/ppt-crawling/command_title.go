@@ -12,65 +12,67 @@ func commandTitle(cfg *config, args ...string) error {
 		return fmt.Errorf("usage: title")
 	}
 
-	urls, queries, err := titleRepl(cfg)
+	urls, err := titleRepl(cfg)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println()
-	fmt.Println("===================================")
-	fmt.Println("                URL                ")
-	fmt.Println("===================================")
-	fmt.Println()
-
 	if len(urls) == 0 {
-		return fmt.Errorf("no url found\n")
-	}
-
-	for i, url := range urls {
-		fmt.Printf("%s: %s\n", queries[i], url)
+		return fmt.Errorf("no url found")
 	}
 
 	return nil
 }
-func titleRepl(cfg *config) ([]string, []string, error) {
+func titleRepl(cfg *config) ([]string, error) {
 	scanner := bufio.NewScanner(os.Stdin)
 	urls := []string{}
-	queries := []string{}
 	for {
-
+		var lines []string
 		fmt.Print("title > ")
-		scanner.Scan()
-
-		words := cleanInput(scanner.Text())
-		if len(words) == 0 {
-			continue
+		for scanner.Scan() {
+			line := scanner.Text()
+			if line == "" || line == "exit" {
+				break
+			}
+			lines = append(lines, line)
 		}
 
-		if len(words) == 1 && words[0] == "exit" {
+		if err := scanner.Err(); err != nil {
+			return nil, fmt.Errorf("error reading input: %v", err)
+		}
+
+		if len(lines) == 0 {
 			break
 		}
-		joinedQuery := strings.Join(words, " ")
+
 		postfix := " ppt"
-
-		queries = append(queries, joinedQuery)
-
-		fullQuery := fmt.Sprintf("%s%s", joinedQuery, postfix)
-
-		fmt.Println("fullQuery: ", fullQuery)
-
-		url, err := titleSearch(cfg, fullQuery)
-		if err != nil {
-			if err.Error() == "no search result found" {
-				fmt.Println(err)
+		for _, line := range lines {
+			words := cleanInput(line)
+			if len(words) == 0 {
 				continue
 			}
-			return nil, nil, err
+			if len(words) == 1 && words[0] == "exit" {
+				return urls, nil
+			}
+			queryString := strings.Join(words, " ")
+			fullQuery := fmt.Sprintf("%s%s", queryString, postfix)
+
+			url, err := titleSearch(cfg, fullQuery)
+			if err != nil {
+				if err.Error() == "no search result found" {
+					fmt.Println(err)
+					continue
+				}
+				return nil, err
+			}
+			cfg.downloadURL[queryString] = url
+			urls = append(urls, url)
+			fmt.Printf("Processing %s\n", queryString)
 		}
-		urls = append(urls, url)
+
 	}
 
-	return urls, queries, nil
+	return urls, nil
 }
 
 func titleSearch(cfg *config, query string) (string, error) {
@@ -79,16 +81,12 @@ func titleSearch(cfg *config, query string) (string, error) {
 		return "", err
 	}
 
-	println("start")
-
 	var link string
 	for _, item := range response.Items {
 		if strings.HasPrefix(item.Link, TistoryTitle) {
 			link = item.Link
 		}
 	}
-	fmt.Println(link)
-	println("end")
 
 	if link == "" {
 		return "", fmt.Errorf("no search result found")
@@ -98,13 +96,11 @@ func titleSearch(cfg *config, query string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("ImageBlocks start")
 
 	imageblocks, err := getImageBlocks(str)
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(len(imageblocks))
 
 	var urls []string
 

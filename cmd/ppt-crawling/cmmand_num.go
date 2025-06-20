@@ -25,7 +25,7 @@ func commandNum(cfg *config, args ...string) error {
 
 	var link string
 	for _, item := range response.Items {
-		if strings.HasPrefix(item.Link, TistoryNum) {
+		if strings.HasPrefix(item.Link, TistoryTitle) {
 			link = item.Link
 		}
 	}

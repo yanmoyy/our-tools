@@ -32,5 +32,26 @@ func commandTitle(cfg *config, args ...string) error {
 	fmt.Println(link)
 	println("end")
 
+	str, err := getHTML(link)
+	if err != nil {
+		return err
+	}
+	fmt.Println("ImageBlocks start")
+
+	imageblocks, err := getImageBlocks(str)
+	if err != nil {
+		return err
+	}
+	fmt.Println(len(imageblocks))
+
+	var urls []string
+
+	for _, imageblock := range imageblocks {
+		hrefs, _ := getURLFromImageBlock(imageblock)
+		urls = append(urls, hrefs...)
+	}
+
+	fmt.Printf("%s?original\n", urls[1])
+
 	return nil
 }

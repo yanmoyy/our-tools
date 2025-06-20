@@ -101,6 +101,7 @@ func requestGetAuthCode(apiKey, redirectURI string) error {
 	q.Add("client_id", apiKey)
 	q.Add("redirect_uri", redirectURI)
 	q.Add("response_type", "code")
+	q.Add("scope", "talk_message")
 	req.URL.RawQuery = q.Encode()
 
 	// print the URL for user to open

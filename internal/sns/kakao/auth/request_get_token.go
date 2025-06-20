@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/yanmoyy/our-tools/internal/sns/kakao/header"
 )
 
 // get auth token from Kakao Talk.
@@ -22,7 +24,7 @@ func requestGetToken(apiKey, code, redirectURI string) (token, error) {
 	if err != nil {
 		return token{}, err
 	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+	req.Header.Set("Content-Type", header.UrlEncoded)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return token{}, err

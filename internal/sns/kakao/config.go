@@ -3,16 +3,13 @@ package kakao
 import (
 	"fmt"
 	"os"
-	"sync"
 )
 
 type Config struct {
 	apiKey      string
 	redirectURI string
 	authCode    string
-	mu          sync.Mutex
-	// accessToken  string
-	// refreshToken string
+	token       token
 }
 
 func NewConfig() (*Config, error) {

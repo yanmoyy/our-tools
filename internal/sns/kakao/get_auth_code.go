@@ -13,14 +13,14 @@ import (
 
 const successHTML = "internal/sns/templates/success.html"
 
-func (cfg *Config) getAuthCode() error {
+func (cfg *Config) getAuthCode() (string, error) {
 	srv := &http.Server{
 		Addr:              ":8080",
 		ReadHeaderTimeout: 3 * time.Second,
 	}
 	// channel for signal when callback is received
-	codeReceived := make(chan struct{})
-	http.HandleFunc("/oauth", cfg.handleCallback(codeReceived))
+	codeCh := make(chan string)
+	http.HandleFunc("/oauth", cfg.handleCallback(codeCh))
 	// Context for server shutdown
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -36,44 +36,39 @@ func (cfg *Config) getAuthCode() error {
 
 	if err := requestAuthCode(cfg.apiKey, cfg.redirectURI); err != nil {
 		cancel()
-		return fmt.Errorf("failed to request auth code: %s", err)
+		return "", fmt.Errorf("failed to request auth code: %s", err)
 	}
 
+	var code string
 	// wait for callback
 	select {
-	case <-codeReceived:
+	case code = <-codeCh:
 		// callback received
 	case <-ctx.Done():
 		// parent context canceled
-		return ctx.Err()
+		return "", ctx.Err()
 	}
 	// shutdown server gracefully
 	if err := srv.Shutdown(ctx); err != nil {
-		return fmt.Errorf("failed to shutdown server: %s", err)
+		return "", fmt.Errorf("failed to shutdown server: %s", err)
 	}
 	// wait for server fully shutdown
 	wg.Wait()
 
-	cfg.mu.Lock() // lock to prevent race condition
-	defer cfg.mu.Unlock()
-	if cfg.authCode == "" { // no auth code received
-		return fmt.Errorf("no auth code received")
+	if code == "" {
+		return "", fmt.Errorf("no auth code received")
 	}
-	return nil
+	return code, nil
 }
 
 // save auth code to config
-func (cfg *Config) handleCallback(done chan struct{}) http.HandlerFunc {
+func (cfg *Config) handleCallback(ch chan string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		code := r.URL.Query().Get("code")
 		if code == "" {
 			http.Error(w, "no code", http.StatusBadRequest)
 			return
 		}
-
-		cfg.mu.Lock()
-		cfg.authCode = code
-		cfg.mu.Unlock()
 
 		// Send HTML response with JavaScript to attempt auto-close
 		w.Header().Set("Content-Type", "text/html")
@@ -87,13 +82,14 @@ func (cfg *Config) handleCallback(done chan struct{}) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		close(done)
+		ch <- code
+		close(ch)
 	}
 }
 
 // send request to get auth code, the code will be handled by callback server
 func requestAuthCode(clientID, redirectURI string) error {
-	req, err := http.NewRequest("GET", GetAuthCodeURL, nil)
+	req, err := http.NewRequest("GET", getAuthCodeURL, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %s", err)
 	}

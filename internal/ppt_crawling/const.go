@@ -1,4 +1,4 @@
-package crawling_api
+package ppt_crawling
 
 const (
 	GooGleSearch  = "https://www.google.com/search?q="

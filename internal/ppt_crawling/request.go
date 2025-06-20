@@ -1,4 +1,4 @@
-package crawling_api
+package ppt_crawling
 
 type googleSearchResponse struct {
 	Kind string `json:"kind"`

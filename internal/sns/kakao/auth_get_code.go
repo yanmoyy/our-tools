@@ -13,7 +13,10 @@ import (
 
 const successHTML = "internal/sns/templates/success.html"
 
-func (cfg *Config) getAuthCode() (string, error) {
+// get auth code from Kakao Talk.
+// See more info:
+// https://developers.kakao.com/docs/latest/en/kakaologin/rest-api#request-code
+func (cfg *Config) getCode() (string, error) {
 	srv := &http.Server{
 		Addr:              ":8080",
 		ReadHeaderTimeout: 3 * time.Second,

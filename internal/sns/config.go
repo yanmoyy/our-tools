@@ -1,7 +1,7 @@
 package sns
 
 import (
-	"fmt"
+	"strings"
 
 	"github.com/yanmoyy/our-tools/internal/sns/kakao"
 )
@@ -9,18 +9,22 @@ import (
 type snsType string
 
 const (
-	Unknown snsType = "unknown"
+	Default snsType = "default"
 	Kakao   snsType = "kakao"
 )
 
+func (snsType snsType) Upper() string {
+	return strings.ToUpper(string(snsType))
+}
+
 type config struct {
-	kakaoConfig *kakao.Config
-	snsType     snsType
+	kakao   *kakao.Config
+	snsType snsType
 }
 
 func NewConfig() (*config, error) {
 	return &config{
-		snsType: Unknown,
+		snsType: Default,
 	}, nil
 }
 
@@ -29,15 +33,15 @@ func (cfg *config) setMode(snsType snsType) error {
 	switch snsType {
 	case Kakao:
 		cfg.snsType = snsType
-		if cfg.kakaoConfig == nil {
+		if cfg.kakao == nil {
 			config, err := kakao.NewConfig()
 			if err != nil {
 				return err
 			}
-			cfg.kakaoConfig = config
+			cfg.kakao = config
 		}
 	default:
-		return fmt.Errorf("unknown sns type: %s", snsType)
+		cfg.snsType = Default
 	}
 	return nil
 }

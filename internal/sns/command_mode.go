@@ -11,6 +11,10 @@ func commandMode(cfg *config, args ...string) error {
 	if len(args) == 0 {
 		fmt.Println("Current mode:", cfg.snsType)
 		printModeHelp()
+		err := setMode(cfg, Default)
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 	if len(args) > 1 {
@@ -23,10 +27,10 @@ func commandMode(cfg *config, args ...string) error {
 		if err != nil {
 			return err
 		}
-		return cfg.kakaoConfig.StartMode()
 	default:
 		return fmt.Errorf("unknown mode argument: %s", mode)
 	}
+	return nil
 }
 
 func printModeHelp() {

@@ -1,9 +1,5 @@
 package auth
 
-import (
-	"fmt"
-)
-
 // #nosec G101
 const (
 	getAuthCodeURL  = "https://kauth.kakao.com/oauth/authorize"
@@ -33,7 +29,6 @@ type token struct {
 }
 
 func (cfg *Config) Login() error {
-	fmt.Println("Login to Kakao Talk...")
 	code, err := cfg.getCode()
 	if err != nil {
 		return err
@@ -44,7 +39,6 @@ func (cfg *Config) Login() error {
 		return err
 	}
 	cfg.token = token
-	fmt.Println("Login to Kakao Talk successfully!")
 	return nil
 }
 

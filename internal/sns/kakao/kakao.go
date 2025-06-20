@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/yanmoyy/our-tools/internal/sns/cli"
 	"github.com/yanmoyy/our-tools/internal/sns/kakao/auth"
 )
 
@@ -28,4 +29,14 @@ func (cfg *Config) StartMode() error {
 		return err
 	}
 	return nil
+}
+
+func GetCommands() map[string]cli.Command[Config] {
+	return map[string]cli.Command[Config]{
+		"login": {
+			Name:        "login",
+			Description: "Login to Kakao Talk",
+			Callback:    commandLogin,
+		},
+	}
 }

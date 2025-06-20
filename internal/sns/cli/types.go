@@ -6,3 +6,5 @@ type Command[T any] struct {
 	Callback    func(cfg *T, args ...string) error
 	Helper      func()
 }
+
+type Commands[T any] map[string]Command[T]

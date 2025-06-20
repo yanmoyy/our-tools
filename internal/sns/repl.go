@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/yanmoyy/our-tools/internal/sns/cli"
+	"github.com/yanmoyy/our-tools/internal/sns/kakao"
 )
 
 func printGreeting() {
@@ -16,7 +19,11 @@ func StartRepl(cfg *config) {
 	printGreeting()
 	reader := bufio.NewScanner(os.Stdin)
 	for {
-		fmt.Print("SNS > ")
+		if cfg.snsType == Default {
+			fmt.Print("SNS > ")
+		} else {
+			fmt.Printf("%s > ", cfg.snsType.Upper())
+		}
 		reader.Scan()
 
 		words := cleanInput(reader.Text())
@@ -29,17 +36,16 @@ func StartRepl(cfg *config) {
 		if len(words) > 1 {
 			args = words[1:]
 		}
-
-		command, exists := getCommands()[commandName]
+		command, exists := getCommands(cfg)[commandName]
 		if !exists {
 			fmt.Println("Invalid command")
 			continue
 		}
-		err := command.callback(cfg, args...)
+		err := command.Callback(cfg, args...)
 		if err != nil {
 			fmt.Printf("Error: %s\n", err)
 			if strings.Contains(err.Error(), "argument") {
-				command.helper()
+				command.Helper()
 			}
 		}
 	}
@@ -51,30 +57,53 @@ func cleanInput(text string) []string {
 	return words
 }
 
-type cliCommand struct {
-	name        string
-	description string
-	callback    func(*config, ...string) error
-	helper      func()
+func getCommands(cfg *config) cli.Commands[config] {
+	commands := getDefaultCommands()
+	for _, cmd := range getSNSCommands(cfg) {
+		commands[cmd.Name] = cmd
+	}
+	return commands
 }
 
-func getCommands() map[string]cliCommand {
-	return map[string]cliCommand{
+func getDefaultCommands() cli.Commands[config] {
+	return cli.Commands[config]{
 		"help": {
-			name:        "help",
-			description: "Displays a help message",
-			callback:    commandHelp,
+			Name:        "help",
+			Description: "Displays a help message",
+			Callback:    commandHelp,
 		},
 		"exit": {
-			name:        "exit",
-			description: "Exit the SNS-Sender",
-			callback:    commandExit,
+			Name:        "exit",
+			Description: "Exit the SNS-Sender",
+			Callback:    commandExit,
 		},
 		"mode": {
-			name:        "mode",
-			description: "Change (or show) target SNS Mode (args: [mode])",
-			callback:    commandMode,
-			helper:      printModeHelp,
+			Name:        "mode",
+			Description: "Change target SNS Mode (or default)",
+			Callback:    commandMode,
+			Helper:      printModeHelp,
+		},
+	}
+}
+
+func getSNSCommands(cfg *config) cli.Commands[config] {
+	commands := cli.Commands[config]{}
+	switch cfg.snsType {
+	case Kakao:
+		kakaoCmds := kakao.GetCommands()
+		for _, cmd := range kakaoCmds {
+			commands[cmd.Name] = convertCommandToDefault(cfg.kakao, cmd)
+		}
+	}
+	return commands
+}
+
+func convertCommandToDefault[T any](cfg *T, cmd cli.Command[T]) cli.Command[config] {
+	return cli.Command[config]{
+		Name:        cmd.Name,
+		Description: cmd.Description,
+		Callback: func(commonCfg *config, args ...string) error {
+			return cmd.Callback(cfg, args...)
 		},
 	}
 }

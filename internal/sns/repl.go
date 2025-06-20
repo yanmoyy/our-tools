@@ -17,6 +17,15 @@ func printGreeting() {
 	fmt.Println("Sending your SNS message on terminal.")
 }
 
+func printPrompt(snsType snsType) {
+	if snsType == Default {
+		fmt.Print(Default.ColorString("SNS > "))
+	} else {
+		str := fmt.Sprintf("%s > ", snsType.Upper())
+		fmt.Print(Kakao.ColorString(str))
+	}
+}
+
 func StartRepl(cfg *config) {
 	printGreeting()
 	reader := bufio.NewScanner(os.Stdin)
@@ -29,20 +38,12 @@ func StartRepl(cfg *config) {
 		for range sigChan {
 			fmt.Print("\b\b  \b\b") // erase the last two characters (^C)
 			fmt.Println()
-			if cfg.snsType == Default {
-				fmt.Print("SNS > ")
-			} else {
-				fmt.Printf("%s > ", cfg.snsType.Upper())
-			}
+			printPrompt(cfg.snsType)
 		}
 	}()
 
 	for {
-		if cfg.snsType == Default {
-			fmt.Print("SNS > ")
-		} else {
-			fmt.Printf("%s > ", cfg.snsType.Upper())
-		}
+		printPrompt(cfg.snsType)
 		reader.Scan()
 
 		words := cleanInput(reader.Text())
@@ -58,6 +59,7 @@ func StartRepl(cfg *config) {
 		command, exists := getCommands(cfg)[commandName]
 		if !exists {
 			fmt.Println("Invalid command")
+			_ = commandHelp(cfg)
 			continue
 		}
 		err := command.Callback(cfg, args...)

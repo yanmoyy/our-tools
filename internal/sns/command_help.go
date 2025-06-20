@@ -8,8 +8,6 @@ import (
 )
 
 func commandHelp(cfg *config, args ...string) error {
-	fmt.Println()
-	fmt.Println("Welcome to the SNS-Sender!")
 	fmt.Println("Usage: <command> [args]")
 	if cfg.snsType != Default {
 		fmt.Printf("Current Mode: %s\n", cfg.snsType.Upper())

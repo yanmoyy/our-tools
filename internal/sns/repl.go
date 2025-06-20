@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"github.com/yanmoyy/our-tools/internal/sns/cli"
 	"github.com/yanmoyy/our-tools/internal/sns/kakao"
@@ -18,6 +20,23 @@ func printGreeting() {
 func StartRepl(cfg *config) {
 	printGreeting()
 	reader := bufio.NewScanner(os.Stdin)
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT)
+
+	// Handle Ctrl+C signals
+	go func() {
+		for range sigChan {
+			fmt.Print("\b\b  \b\b") // erase the last two characters (^C)
+			fmt.Println()
+			if cfg.snsType == Default {
+				fmt.Print("SNS > ")
+			} else {
+				fmt.Printf("%s > ", cfg.snsType.Upper())
+			}
+		}
+	}()
+
 	for {
 		if cfg.snsType == Default {
 			fmt.Print("SNS > ")

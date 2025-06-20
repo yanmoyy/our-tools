@@ -48,6 +48,8 @@ func getAuthCode(apiKey, redirectURI string) (string, error) {
 	select {
 	case code = <-codeCh:
 		// callback received
+	case <-time.After(5 * time.Second):
+		// timeout
 	case <-ctx.Done():
 		// parent context canceled
 		return "", ctx.Err()
@@ -101,7 +103,7 @@ func requestGetAuthCode(apiKey, redirectURI string) error {
 	q.Add("client_id", apiKey)
 	q.Add("redirect_uri", redirectURI)
 	q.Add("response_type", "code")
-	q.Add("scope", "talk_message")
+	q.Add("scope", "talk_message,friends,profile_nickname")
 	req.URL.RawQuery = q.Encode()
 
 	// print the URL for user to open

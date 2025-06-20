@@ -36,5 +36,10 @@ func GetCommands() map[string]cli.Command[Config] {
 			Callback:    commandSend,
 			Helper:      printSendHelp,
 		},
+		"ls": {
+			Name:        "ls",
+			Description: "List friends",
+			Callback:    commandListFriends,
+		},
 	}
 }

@@ -44,7 +44,10 @@ func StartRepl(cfg *config) {
 
 	for {
 		printPrompt(cfg.snsType)
-		reader.Scan()
+		if !reader.Scan() {
+			fmt.Println()
+			break
+		}
 
 		words := cleanInput(reader.Text())
 		if len(words) == 0 {

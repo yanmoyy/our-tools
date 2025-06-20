@@ -12,19 +12,9 @@ import (
 	"github.com/yanmoyy/our-tools/internal/sns/kakao/header"
 )
 
-type TextObject struct {
-	ObjectType string `json:"object_type"`
-	Text       string `json:"text"`
-	Link       struct {
-		WebURL       string `json:"web_url"`
-		MobileWebURL string `json:"mobile_web_url"`
-	} `json:"link"`
-	ButtonTitle string `json:"button_title"`
-}
-
 func requestSendToMe(token, message string) error {
 	reqBody := url.Values{}
-	textObject := TextObject{
+	textObject := textObject{
 		ObjectType: "text",
 		Text:       message,
 	}

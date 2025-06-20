@@ -2,7 +2,7 @@ package msg
 
 const (
 	sendToMeURL      = "https://kapi.kakao.com/v2/api/talk/memo/default/send"
-	sentToFriendsURL = "https://kapi.kakao.com/v1/api/talk/friends/message/send"
+	sentToFriendsURL = "https://kapi.kakao.com/v1/api/talk/friends/message/default/send"
 )
 
 type textObject struct {
@@ -15,10 +15,10 @@ type textObject struct {
 	ButtonTitle string `json:"button_title"`
 }
 
-func Send(token, target, message string) error {
-	if target == "me" {
-		return requestSendToMe(token, message)
-	}
-	// TODO: send to specific user
-	return nil
+func SendToMe(token, message string) error {
+	return requestSendToMe(token, message)
+}
+
+func SendToFriend(token, receiverUUID, message string) error {
+	return requestSendToFriends(token, []string{receiverUUID}, message)
 }

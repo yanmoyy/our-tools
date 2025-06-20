@@ -6,10 +6,12 @@ import (
 
 	"github.com/yanmoyy/our-tools/internal/sns/cli"
 	"github.com/yanmoyy/our-tools/internal/sns/kakao/auth"
+	"github.com/yanmoyy/our-tools/internal/sns/kakao/social"
 )
 
 type Config struct {
-	auth *auth.Config
+	auth    *auth.Config
+	friends []social.Friend
 }
 
 func NewConfig() (*Config, error) {

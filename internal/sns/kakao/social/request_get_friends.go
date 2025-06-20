@@ -3,20 +3,18 @@ package social
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/yanmoyy/our-tools/internal/sns/kakao/auth"
 )
 
-type friend struct {
-	ID              int64  `json:"id"` // service user ID
+type Friend struct {
 	UUID            string `json:"uuid"`
 	ProfileNickname string `json:"profile_nickname"`
 }
 
 type getFriendsResponse struct {
-	Elements   []friend `json:"elements"`
+	Elements   []Friend `json:"elements"`
 	TotalCount int      `json:"total_count"`
 	BeforeURL  string   `json:"before_url"`
 	AfterURL   string   `json:"after_url"`
@@ -35,12 +33,6 @@ func requestGetFriends(token string) (getFriendsResponse, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		// print body
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return getFriendsResponse{}, fmt.Errorf("failed to read response body: %w", err)
-		}
-		fmt.Println(string(body))
 		return getFriendsResponse{}, fmt.Errorf("failed to get friends (status: %s)", resp.Status)
 	}
 	var response getFriendsResponse

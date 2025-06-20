@@ -4,7 +4,7 @@ const (
 	getFriendsURL = "https://kapi.kakao.com/v1/api/talk/friends"
 )
 
-func GetFriends(token string) ([]friend, error) {
+func GetFriends(token string) ([]Friend, error) {
 	resp, err := requestGetFriends(token)
 	if err != nil {
 		return nil, err

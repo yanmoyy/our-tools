@@ -48,8 +48,6 @@ func getAuthCode(apiKey, redirectURI string) (string, error) {
 	select {
 	case code = <-codeCh:
 		// callback received
-	case <-time.After(5 * time.Second):
-		// timeout
 	case <-ctx.Done():
 		// parent context canceled
 		return "", ctx.Err()

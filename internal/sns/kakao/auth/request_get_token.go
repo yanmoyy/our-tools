@@ -8,14 +8,15 @@ import (
 	"strings"
 )
 
-// get refreshed token from Kakao Talk.
+// get auth token from Kakao Talk.
 // See more info:
-// https://developers.kakao.com/docs/latest/en/kakaologin/rest-api#refresh-token
-func (cfg *Config) getRefreshedToken() (token, error) {
+// https://developers.kakao.com/docs/latest/en/kakaologin/rest-api#request-code
+func requestGetToken(apiKey, code, redirectURI string) (token, error) {
 	reqBody := url.Values{}
-	reqBody.Add("client_id", cfg.apiKey)
-	reqBody.Add("grant_type", "refresh_token")
-	reqBody.Add("refresh_token", cfg.token.RefreshToken)
+	reqBody.Add("client_id", apiKey)
+	reqBody.Add("code", code)
+	reqBody.Add("redirect_uri", redirectURI)
+	reqBody.Add("grant_type", "authorization_code")
 
 	req, err := http.NewRequest("POST", getTokenURL, strings.NewReader(reqBody.Encode()))
 	if err != nil {
@@ -29,7 +30,7 @@ func (cfg *Config) getRefreshedToken() (token, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return token{}, fmt.Errorf("failed to refresh token (status: %s)", resp.Status)
+		return token{}, fmt.Errorf("failed to get token (status: %s)", resp.Status)
 	}
 	var t token
 	if err := json.NewDecoder(resp.Body).Decode(&t); err != nil {

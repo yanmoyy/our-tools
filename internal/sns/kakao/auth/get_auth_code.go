@@ -17,14 +17,14 @@ const successHTML = "internal/sns/templates/success.html"
 // get auth code from Kakao Talk.
 // See more info:
 // https://developers.kakao.com/docs/latest/en/kakaologin/rest-api#request-code
-func (cfg *Config) getCode() (string, error) {
+func getAuthCode(apiKey, redirectURI string) (string, error) {
 	srv := &http.Server{
 		Addr:              ":8080",
 		ReadHeaderTimeout: 3 * time.Second,
 	}
 	// channel for signal when callback is received
 	codeCh := make(chan string)
-	http.HandleFunc("/oauth", cfg.handleCallback(codeCh))
+	http.HandleFunc("/oauth", handleCallback(codeCh))
 	// Context for server shutdown
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -38,7 +38,7 @@ func (cfg *Config) getCode() (string, error) {
 		}
 	}()
 
-	if err := requestAuthCode(cfg.apiKey, cfg.redirectURI); err != nil {
+	if err := requestGetAuthCode(apiKey, redirectURI); err != nil {
 		cancel()
 		return "", fmt.Errorf("failed to request auth code: %s", err)
 	}
@@ -66,7 +66,7 @@ func (cfg *Config) getCode() (string, error) {
 }
 
 // save auth code to config
-func (cfg *Config) handleCallback(ch chan string) http.HandlerFunc {
+func handleCallback(ch chan string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		code := r.URL.Query().Get("code")
 		if code == "" {
@@ -92,13 +92,13 @@ func (cfg *Config) handleCallback(ch chan string) http.HandlerFunc {
 }
 
 // send request to get auth code, the code will be handled by callback server
-func requestAuthCode(clientID, redirectURI string) error {
+func requestGetAuthCode(apiKey, redirectURI string) error {
 	req, err := http.NewRequest("GET", getAuthCodeURL, nil)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %s", err)
 	}
 	q := req.URL.Query()
-	q.Add("client_id", clientID)
+	q.Add("client_id", apiKey)
 	q.Add("redirect_uri", redirectURI)
 	q.Add("response_type", "code")
 	req.URL.RawQuery = q.Encode()

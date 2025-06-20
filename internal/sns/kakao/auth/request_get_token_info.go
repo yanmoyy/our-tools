@@ -15,12 +15,12 @@ type tokenInfo struct {
 // get token info from Kakao Talk.
 // See more info:
 // https://developers.kakao.com/docs/latest/en/kakaologin/rest-api#get-token-info
-func (cfg *Config) getTokenInfo() (tokenInfo, error) {
+func getTokenInfo(token string) (tokenInfo, error) {
 	req, err := http.NewRequest("GET", getTokenInfoURL, nil)
 	if err != nil {
 		return tokenInfo{}, err
 	}
-	req.Header.Set("Authorization", getBearerToken(cfg.token.AccessToken))
+	req.Header.Set("Authorization", GetBearerToken(token))
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return tokenInfo{}, err
@@ -35,8 +35,4 @@ func (cfg *Config) getTokenInfo() (tokenInfo, error) {
 		return tokenInfo{}, err
 	}
 	return t, nil
-}
-
-func getBearerToken(token string) string {
-	return fmt.Sprintf("Bearer %s", token)
 }

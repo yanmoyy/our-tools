@@ -1,24 +1,82 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strings"
 )
 
 func commandNum(cfg *config, args ...string) error {
-	if len(args) != 1 {
-		return fmt.Errorf("usage: title <query>")
+	if len(args) > 0 {
+		return fmt.Errorf("usage: num")
 	}
-	query := args[0]
 
-	postfix := "장 ppt"
-
-	fullQuery := fmt.Sprintf("%s%s", query, postfix)
-	fmt.Println("fullQuery: ", fullQuery)
-
-	response, err := cfg.client.GoogleSearch(fullQuery)
+	urls, queries, err := numRepl(cfg)
 	if err != nil {
 		return err
+	}
+
+	fmt.Println()
+	fmt.Println("===================================")
+	fmt.Println("                URL                ")
+	fmt.Println("===================================")
+	fmt.Println()
+
+	if len(urls) == 0 {
+		return fmt.Errorf("no url found\n")
+	}
+
+	for i, url := range urls {
+		fmt.Printf("%s: %s\n\n", queries[i], url)
+	}
+
+	return nil
+}
+
+func numRepl(cfg *config) ([]string, []string, error) {
+	scanner := bufio.NewScanner(os.Stdin)
+	urls := []string{}
+	queries := []string{}
+	for {
+
+		fmt.Print("num > ")
+		scanner.Scan()
+
+		words := cleanInput(scanner.Text())
+		if len(words) == 0 {
+			continue
+		}
+		if len(words) == 1 && words[0] == "exit" {
+			break
+		}
+		postfix := "장 ppt"
+
+		queries = append(queries, words[0])
+
+		fullQuery := fmt.Sprintf("%s%s", words[0], postfix)
+		fmt.Println("fullQuery: ", fullQuery)
+
+		url, err := numSearch(cfg, fullQuery)
+		if err != nil {
+			if err.Error() == "no search result found" {
+				fmt.Println(err)
+				continue
+			}
+
+			return nil, nil, err
+		}
+		urls = append(urls, url)
+	}
+
+	return urls, queries, nil
+}
+
+func numSearch(cfg *config, query string) (string, error) {
+
+	response, err := cfg.client.GoogleSearch(query)
+	if err != nil {
+		return "", err
 	}
 
 	println("start")
@@ -29,20 +87,26 @@ func commandNum(cfg *config, args ...string) error {
 			link = item.Link
 		}
 	}
+
+	fmt.Println("Link :", link)
 	println("end")
+
+	if link == "" {
+		return "", fmt.Errorf("no search result found")
+	}
 
 	str, err := getHTML(link)
 	if err != nil {
-		return err
+		return "", err
 	}
 	err = makeHTMLFile(str)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	fileblock, err := getFileBlocks(str)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	var urls []string
@@ -52,9 +116,9 @@ func commandNum(cfg *config, args ...string) error {
 		urls = append(urls, hrefs...)
 	}
 
-	for _, url := range urls {
-		fmt.Println(url)
+	if len(urls) == 0 {
+		return "", fmt.Errorf("no url found")
 	}
 
-	return nil
+	return urls[0], nil
 }

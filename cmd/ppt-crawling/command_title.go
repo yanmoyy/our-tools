@@ -4,36 +4,40 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
 
 func commandTitle(cfg *config, args ...string) error {
-	if len(args) < 1 {
-		return fmt.Errorf("usage: title <count>")
+	if len(args) > 0 {
+		return fmt.Errorf("usage: title")
 	}
 
-	count, err := strconv.Atoi(args[0])
+	urls, queries, err := titleRepl(cfg)
 	if err != nil {
 		return err
 	}
 
-	urls, err := titleRepl(cfg, count)
-	if err != nil {
-		return err
+	fmt.Println()
+	fmt.Println("===================================")
+	fmt.Println("                URL                ")
+	fmt.Println("===================================")
+	fmt.Println()
+
+	if len(urls) == 0 {
+		return fmt.Errorf("no url found\n")
 	}
 
-	for _, url := range urls {
-		fmt.Println(url)
+	for i, url := range urls {
+		fmt.Printf("%s: %s\n", queries[i], url)
 	}
 
 	return nil
 }
-func titleRepl(cfg *config, count int) ([]string, error) {
-
+func titleRepl(cfg *config) ([]string, []string, error) {
 	scanner := bufio.NewScanner(os.Stdin)
 	urls := []string{}
-	for len(urls) < count {
+	queries := []string{}
+	for {
 
 		fmt.Print("title > ")
 		scanner.Scan()
@@ -43,8 +47,13 @@ func titleRepl(cfg *config, count int) ([]string, error) {
 			continue
 		}
 
+		if len(words) == 1 && words[0] == "exit" {
+			break
+		}
 		joinedQuery := strings.Join(words, " ")
 		postfix := " ppt"
+
+		queries = append(queries, joinedQuery)
 
 		fullQuery := fmt.Sprintf("%s%s", joinedQuery, postfix)
 
@@ -52,12 +61,16 @@ func titleRepl(cfg *config, count int) ([]string, error) {
 
 		url, err := titleSearch(cfg, fullQuery)
 		if err != nil {
-			return nil, err
+			if err.Error() == "no search result found" {
+				fmt.Println(err)
+				continue
+			}
+			return nil, nil, err
 		}
 		urls = append(urls, url)
 	}
 
-	return urls, nil
+	return urls, queries, nil
 }
 
 func titleSearch(cfg *config, query string) (string, error) {
@@ -77,6 +90,10 @@ func titleSearch(cfg *config, query string) (string, error) {
 	fmt.Println(link)
 	println("end")
 
+	if link == "" {
+		return "", fmt.Errorf("no search result found")
+	}
+
 	str, err := getHTML(link)
 	if err != nil {
 		return "", err
@@ -94,6 +111,10 @@ func titleSearch(cfg *config, query string) (string, error) {
 	for _, imageblock := range imageblocks {
 		hrefs, _ := getURLFromBlock(imageblock)
 		urls = append(urls, hrefs...)
+	}
+
+	if len(urls) == 0 {
+		return "", fmt.Errorf("no url found")
 	}
 
 	url := fmt.Sprintf("%s%s", urls[1], "?original")

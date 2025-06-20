@@ -28,7 +28,7 @@ func (c *Client) GoogleSearch(query string) (googleSearchResponse, error) {
 	q.Add("q", query)
 
 	req.URL.RawQuery = q.Encode()
-	println(req.URL.String())
+	// println(req.URL.String())
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {

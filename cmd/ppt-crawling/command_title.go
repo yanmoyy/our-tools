@@ -23,6 +23,7 @@ func commandTitle(cfg *config, args ...string) error {
 
 	return nil
 }
+
 func titleRepl(cfg *config) ([]string, error) {
 	scanner := bufio.NewScanner(os.Stdin)
 	urls := []string{}

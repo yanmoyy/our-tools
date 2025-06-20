@@ -23,20 +23,18 @@ func NewConfig() (*Config, error) {
 	}, nil
 }
 
-func (cfg *Config) StartMode() error {
-	err := cfg.auth.Login()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func GetCommands() map[string]cli.Command[Config] {
 	return map[string]cli.Command[Config]{
 		"login": {
 			Name:        "login",
 			Description: "Login to Kakao Talk",
 			Callback:    commandLogin,
+		},
+		"send": {
+			Name:        "send",
+			Description: "Send message to Kakao Talk",
+			Callback:    commandSend,
+			Helper:      printSendHelp,
 		},
 	}
 }

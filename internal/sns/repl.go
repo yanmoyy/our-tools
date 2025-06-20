@@ -45,6 +45,10 @@ func StartRepl(cfg *config) {
 		if err != nil {
 			fmt.Printf("Error: %s\n", err)
 			if strings.Contains(err.Error(), "argument") {
+				if command.Helper == nil {
+					fmt.Println("No help message")
+					continue
+				}
 				command.Helper()
 			}
 		}
@@ -105,5 +109,6 @@ func convertCommandToDefault[T any](cfg *T, cmd cli.Command[T]) cli.Command[conf
 		Callback: func(commonCfg *config, args ...string) error {
 			return cmd.Callback(cfg, args...)
 		},
+		Helper: cmd.Helper,
 	}
 }

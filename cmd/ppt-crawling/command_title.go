@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"html"
 	"strings"
 )
 
@@ -10,9 +9,10 @@ func commandTitle(cfg *config, args ...string) error {
 	if len(args) < 1 {
 		return fmt.Errorf("usage: title <query>")
 	}
-	query := args[:]
-	blank := html.EscapeString(" ")
-	fullQuery := strings.Join(query, blank)
+
+	query := args[0]
+	postfix := " ppt"
+	fullQuery := fmt.Sprintf("%s%s", query, postfix)
 
 	fmt.Println("fullQuery: ", fullQuery)
 
@@ -47,7 +47,7 @@ func commandTitle(cfg *config, args ...string) error {
 	var urls []string
 
 	for _, imageblock := range imageblocks {
-		hrefs, _ := getURLFromImageBlock(imageblock)
+		hrefs, _ := getURLFromBlock(imageblock)
 		urls = append(urls, hrefs...)
 	}
 

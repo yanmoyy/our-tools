@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -16,6 +15,17 @@ func getImageBlocks(htmlbody string) ([]*html.Node, error) {
 	}
 
 	imageblocks := traverseNodes(doc, "span", "class", "imageblock")
-	fmt.Printf("imagesBlock size : %d\n", len(imageblocks))
 	return imageblocks, nil
+}
+
+func getFileBlocks(htmlbody string) ([]*html.Node, error) {
+	htmlReader := strings.NewReader(htmlbody)
+
+	doc, err := html.Parse(htmlReader)
+	if err != nil {
+		return nil, err
+	}
+
+	fileblocks := traverseNodes(doc, "figure", "class", "fileblock")
+	return fileblocks, nil
 }

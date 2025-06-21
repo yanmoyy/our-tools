@@ -6,7 +6,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func getImageBlocks(htmlbody string) ([]*html.Node, error) {
+func getBlocks(htmlbody, nodeType, key, val string) ([]*html.Node, error) {
 	htmlReader := strings.NewReader(htmlbody)
 
 	doc, err := html.Parse(htmlReader)
@@ -14,18 +14,6 @@ func getImageBlocks(htmlbody string) ([]*html.Node, error) {
 		return nil, err
 	}
 
-	imageblocks := traverseNodes(doc, "span", "class", "imageblock")
-	return imageblocks, nil
-}
-
-func getFileBlocks(htmlbody string) ([]*html.Node, error) {
-	htmlReader := strings.NewReader(htmlbody)
-
-	doc, err := html.Parse(htmlReader)
-	if err != nil {
-		return nil, err
-	}
-
-	fileblocks := traverseNodes(doc, "figure", "class", "fileblock")
-	return fileblocks, nil
+	blocks := traverseNodes(doc, nodeType, key, val)
+	return blocks, nil
 }

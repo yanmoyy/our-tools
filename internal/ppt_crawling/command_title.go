@@ -49,6 +49,7 @@ func titleRepl(cfg *Config) ([]string, error) {
 		postfix := " ppt"
 		for _, line := range lines {
 			words := cleanInput(line)
+
 			if len(words) == 0 {
 				continue
 			}
@@ -67,7 +68,6 @@ func titleRepl(cfg *Config) ([]string, error) {
 				return nil, err
 			}
 			cfg.DownloadURL[queryString] = url
-			urls = append(urls, url)
 			fmt.Printf("Processing %s\n", queryString)
 		}
 
@@ -95,26 +95,50 @@ func titleSearch(cfg *Config, query string) (string, error) {
 
 	str, err := getHTML(link)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error get HTML: %v", err)
 	}
 
-	imageblocks, err := getImageBlocks(str)
+	imageblocks, err := getBlocks(str, "span", "class", "imageblock")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error get imageblock: %v", err)
 	}
 
-	var urls []string
+	var imageUrls []string
 
 	for _, imageblock := range imageblocks {
 		hrefs, _ := getURLFromBlock(imageblock)
-		urls = append(urls, hrefs...)
+		for _, href := range hrefs {
+			imageUrls = append(imageUrls, fmt.Sprintf("%s?original", href))
+		}
 	}
 
-	if len(urls) == 0 {
-		return "", fmt.Errorf("no url found")
+	fileblocks, err := getBlocks(str, "figure", "class", "fileblock")
+	if err != nil {
+		return "", fmt.Errorf("error get fileblock: %v", err)
 	}
 
-	url := fmt.Sprintf("%s%s", urls[1], "?original")
+	var fileUrls []string
+
+	for _, fileblock := range fileblocks {
+		hrefs, _ := getURLFromBlock(fileblock)
+		fileUrls = append(fileUrls, hrefs...)
+
+	}
+	var url string
+
+	if imageUrls == nil {
+		if len(fileUrls) == 3 {
+			url = fileUrls[1]
+		} else {
+			url = fileUrls[0]
+		}
+	} else {
+		if len(imageUrls) == 3 {
+			url = imageUrls[1]
+		} else {
+			url = imageUrls[0]
+		}
+	}
 
 	return url, nil
 }

@@ -61,7 +61,7 @@ func numRepl(cfg *Config) ([]string, error) {
 			queryString := strings.Join(words, " ")
 			fullQuery := fmt.Sprintf("%s%s", queryString, postfix)
 
-			url, err := numSearch(cfg, fullQuery)
+			urls, err := numSearch(cfg, fullQuery)
 			if err != nil {
 				if err.Error() == "no search result found" {
 					fmt.Println(err)
@@ -70,8 +70,7 @@ func numRepl(cfg *Config) ([]string, error) {
 				return nil, err
 			}
 
-			urls = append(urls, url)
-			cfg.DownloadURL[queryString] = url
+			cfg.DownloadURL[queryString] = urls
 			fmt.Printf("Processing %s\n", queryString)
 		}
 
@@ -100,28 +99,50 @@ func numSearch(cfg *Config, query string) (string, error) {
 
 	str, err := getHTML(link)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error get HTML: %v", err)
 	}
-	err = makeHTMLFile(str)
+
+	imageblocks, err := getBlocks(str, "span", "class", "imageblock")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error get imageblock: %v", err)
 	}
 
-	fileblock, err := getFileBlocks(str)
+	var imageUrls []string
+
+	for _, imageblock := range imageblocks {
+		hrefs, _ := getURLFromBlock(imageblock)
+		for _, href := range hrefs {
+			imageUrls = append(imageUrls, fmt.Sprintf("%s?original", href))
+		}
+	}
+
+	fileblocks, err := getBlocks(str, "figure", "class", "fileblock")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error get fileblock: %v", err)
 	}
 
-	var urls []string
+	var fileUrls []string
 
-	for _, fileblock := range fileblock {
+	for _, fileblock := range fileblocks {
 		hrefs, _ := getURLFromBlock(fileblock)
-		urls = append(urls, hrefs...)
+		fileUrls = append(fileUrls, hrefs...)
+
+	}
+	var url string
+
+	if imageUrls == nil {
+		if len(fileUrls) == 3 {
+			url = fileUrls[1]
+		} else {
+			url = fileUrls[0]
+		}
+	} else {
+		if len(imageUrls) == 3 {
+			url = imageUrls[1]
+		} else {
+			url = imageUrls[0]
+		}
 	}
 
-	if len(urls) == 0 {
-		return "", fmt.Errorf("no url found")
-	}
-
-	return urls[0], nil
+	return url, nil
 }

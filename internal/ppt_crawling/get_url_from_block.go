@@ -12,5 +12,5 @@ func getURLFromBlock(block *html.Node) ([]string, error) {
 		return urls, nil
 	}
 
-	return nil, fmt.Errorf("urls not found")
+	return nil, fmt.Errorf("urls not found in getURLFromBlock")
 }

@@ -42,68 +42,55 @@ CSE_API_KEY=your_cse_api_key
 
 - show all of command's information.
 
-### 3. title
+### 3. search <start? | num> / s <start?| num>
 
-- search ppt download url by title.
+- search ppt download url by query.
 
-- this command target specific site.
+- start argument is optional.
 
-  - `https://cwy0675.tistory.com/entry/`
+  - start argument is number and it will search 10 ppt from start number
 
-- to search ppt download url by title, you type input with newline
+    - it is not searched exactly 10 ppt. because it will happen error.
+    - but it will show how many ppt have been searched.
+
+  - if you type start argument, it will search ppt download url from start number.
+  - other wise, it will search ppt from default start number(1).
+
+  - it is not more than 90. (because of google api limit)
+
+- to search ppt download url by query, you type input with newline
 - that is, you can type multiple lines.
-- and if you type nothing, it will search all of ppt download url about your titles.
+- and if you type nothing, it will search all of ppt download url about your queries.
 
 - to quit title state, type **exit** command.
 
   - example
 
     ```
-    ppt-crawler > title
-    title > 나의 힘이 되신 여호와여
+    ppt-crawler > search
+    search > 페이커
 
-    Processing 나의 힘이 되신 여호와여
-    title >
-    title > exit
+    ===================================
+    Starting Searching... (페이커)
+
+    Found 0 urls
+
+    no url found in 페이커
+    ===================================
+    search >
+    search > exit
     ppt-crawler >
     ```
 
 - **note** : if you type title with korea language, it will happen error if you doesn't delete the space.
 
-### 4. num
-
-- search ppt download url by number.
-
-- this command target specific site.
-
-  - `https://lifestoryteller.tistory.com/`
-
-- to search ppt download url by number, you type input with newline
-- that is, you can type multiple lines.
-- and if you type nothing, it will search all of ppt download url about your numbers.
-
-- to quit num state, type **exit** command.
-
-  - example
-
-    ```
-    ppt-crawler > num
-    num > 150
-
-    Processing 150
-    num >
-
-    num > exit
-    ppt-crawler >
-    ```
-
-### 5. download <path?>
+### 4. download <path?>
 
 - download all of ppt download url that you have searched.
 
 - if you type path argument, it will download ppt files that you have searched to the path.
 - otherwise, it will download ppt files to the root directory.
 
-### 6. exit
+### 5. exit
 
 - exit ppt-crawling cli.

@@ -11,6 +11,7 @@ func main() {
 	cfg := &ppt_crawling.Config{
 		Client:      pptClient,
 		DownloadURL: map[string]string{},
+		StartPages:  1,
 	}
 
 	ppt_crawling.StartRepl(cfg)

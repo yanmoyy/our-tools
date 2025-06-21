@@ -20,20 +20,20 @@ func commandDownload(cfg *Config, args ...string) error {
 	fmt.Println()
 
 	for query, url := range cfg.DownloadURL {
-
 		filepath := fmt.Sprintf("%s%s.ppt", filepath, query)
 		err := DownloadFile(url, filepath)
-		fmt.Printf("Downloading %s\n", filepath)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Printf("error downloading (%s): %v\n", query, err)
 			continue
 		}
+		fmt.Println("Completed downloading")
 	}
 
 	return nil
 }
 
 func DownloadFile(url string, filepath string) error {
+	fmt.Printf("Downloading %s\n", filepath)
 	// Create the file
 	fmt.Println("url: ", url)
 	out, err := os.Create(filepath)

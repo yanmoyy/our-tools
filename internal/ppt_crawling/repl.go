@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Client      Client
 	DownloadURL map[string]string
+	StartPages  int
 }
 
 type cliCommand struct {
@@ -20,15 +21,10 @@ type cliCommand struct {
 
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
-		"title": {
-			name:        "title",
-			description: fmt.Sprintf("search praise download url in %s", TistoryTitle),
-			callback:    commandTitle,
-		},
-		"num": {
-			name:        "num",
-			description: fmt.Sprintf("search praise download url in %s", TistoryNum),
-			callback:    commandNum,
+		"search": {
+			name:        "search",
+			description: fmt.Sprintf("search praise download url (count: 10)"),
+			callback:    commandSearch,
 		},
 		"download": {
 			name:        "download",
@@ -66,6 +62,10 @@ func StartRepl(cfg *Config) {
 		}
 
 		commandName := words[0]
+
+		if commandName == "s" {
+			commandName = "search"
+		}
 
 		args := []string{}
 		if len(words) > 1 {

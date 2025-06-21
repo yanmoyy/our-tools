@@ -8,10 +8,11 @@ func commandList(cfg *Config, args ...string) error {
 	fmt.Println("                URL                ")
 	fmt.Println("===================================")
 	fmt.Println()
-	for query, url := range cfg.DownloadURL {
-		fmt.Printf("%s: %s\n", query, url)
-	}
 	fmt.Println()
+
+	for query, url := range cfg.DownloadURL {
+		print(fmt.Sprintf("%s : %s\n", query, url))
+	}
 
 	return nil
 }

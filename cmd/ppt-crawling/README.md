@@ -25,7 +25,7 @@ CSE_API_KEY=your_cse_api_key
 
    - 3-1. just **go run** command
 
-     - `go run ./cmd/ppt-crawling/...`
+     - `go run ./cmd/ppt-crawling/main.go`
 
    - 3-2. build the binary file and run it.
 

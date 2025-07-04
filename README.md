@@ -19,6 +19,8 @@ Explore the tools in progress within the `cmd` directory, each with its own
   - Send an SNS message on terminal
 - [PPT Crawling](./cmd/ppt-crawling/README.md) (kaeba0616)
   - Crawl a PPT file and save it as HTML file.
+- [select-item](./cmd/select-item/README.md) (kaeab0616)
+  - Select an item from a list and print it (animation & coloring).
 
 ---
 

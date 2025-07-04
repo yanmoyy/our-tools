@@ -10,7 +10,7 @@ import (
 
 func commandSearch(cfg *Config, args ...string) error {
 	if len(args) > 1 {
-		return fmt.Errorf("usage: search <start>")
+		return fmt.Errorf("usage: search <start_page>")
 	} else if len(args) == 1 {
 		start := args[0]
 		startInt, err := strconv.Atoi(start)

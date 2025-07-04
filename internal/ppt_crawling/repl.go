@@ -36,6 +36,11 @@ func getCommands() map[string]cliCommand {
 			description: "list all praise",
 			callback:    commandList,
 		},
+		"mail": {
+			name:        "mail",
+			description: "send email me with download urls",
+			callback:    commandMail,
+		},
 		"exit": {
 			name:        "exit",
 			description: "exit repl",

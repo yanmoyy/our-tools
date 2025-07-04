@@ -1,6 +1,8 @@
 package ppt_crawling
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func commandList(cfg *Config, args ...string) error {
 	fmt.Println()
